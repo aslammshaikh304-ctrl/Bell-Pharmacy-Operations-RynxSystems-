@@ -4,24 +4,48 @@ use tauri::command;
 
 #[command]
 pub async fn start_nomination_checker() -> Result<String, String> {
-    let automation_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-        .parent()
-        .unwrap()      // apps/desktop
-        .parent()
-        .unwrap()      // apps
-        .parent()
-        .unwrap()      // BellPharmacyOperations
-        .join("automation");
+    let manifest = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
 
-    println!("Automation Dir: {:?}", automation_dir);
+println!("Manifest: {:?}", manifest);
 
-    let output = Command::new(automation_dir.join(".venv").join("Scripts").join("python.exe"))
-    .env("PYTHONPATH", automation_dir.join("src"))
-    .args([
-        "-m",
-        "rynx_pharmacy.workflows.check_nominations",
-    ])
-    .current_dir(&automation_dir)
+let automation_dir = manifest.join("../../../assets/automation");
+
+println!("Automation: {:?}", automation_dir);
+println!("Exists: {}", automation_dir.exists());
+
+let python = automation_dir
+    .join(".venv")
+    .join("Scripts")
+    .join("python.exe");
+
+println!("Python: {:?}", python);
+println!("Python Exists: {}", python.exists());
+
+let src = automation_dir.join("src");
+
+println!("Src: {:?}", src);
+println!("Src Exists: {}", src.exists());
+
+    let python = automation_dir
+        .join(".venv")
+        .join("Scripts")
+        .join("python.exe");
+
+    let src = automation_dir.join("src");
+
+    println!("Automation : {:?}", automation_dir);
+    println!("Python     : {:?}", python);
+    println!("Python OK  : {}", python.exists());
+    println!("SRC        : {:?}", src);
+    println!("SRC OK     : {}", src.exists());
+
+    let output = Command::new(&python)
+        .env("PYTHONPATH", &src)
+        .args([
+            "-m",
+            "rynx_pharmacy.workflows.check_nominations",
+        ])
+        .current_dir(&automation_dir)
         .output()
         .map_err(|e| e.to_string())?;
 
